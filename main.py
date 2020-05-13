@@ -93,7 +93,7 @@ def main():
     print("Extraction and preprocessing time: ", str(time.time() - start))
 
     for cnn in config.cnn_list:
-
+        start = time.time()
         # init cnn
         model = models.Sequential()
 
@@ -114,6 +114,9 @@ def main():
         model.add(layers.Dropout(0.2))
         model.add(layers.Dense(1024, activation='relu'))
         model.add(layers.Dropout(0.2))
+        model.add(layers.Dense(1024, activation='relu'))
+        model.add(layers.Dropout(0.2))
+
 
         model.add(layers.Dense(7, activation='softmax'))
 
@@ -126,6 +129,8 @@ def main():
 
         hist = model.fit(training_pixels, training_labels, batch_size = 256, epochs = cnn["epochs"],
                         validation_data = (private_test_pixels, private_test_labels))
+
+        print("CNN training time: ", str(time.time() - start))
 
         # get results
         training_accuracy = hist.history["accuracy"]
@@ -150,6 +155,4 @@ def main():
 
         plt.show()
 
-asd = range(1, 6)
-print(asd)
 main()
