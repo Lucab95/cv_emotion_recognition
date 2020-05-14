@@ -126,7 +126,7 @@ def main():
             loss = cnn["loss"],
             metrics = cnn["metrics"]
         )
-
+        print(model.summary())
         hist = model.fit(training_pixels, training_labels, batch_size = 256, epochs = cnn["epochs"],
                         validation_data = (private_test_pixels, private_test_labels))
 
