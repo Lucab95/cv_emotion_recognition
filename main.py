@@ -1,42 +1,11 @@
-import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from keras import models
-from keras import layers
-from keras import optimizers
 from keras.utils import to_categorical
 import config
+import cnn
 import time
-from pathlib import Path
-import pickle
+import janitor as jn
 
-def create_dir(path):
-    path = str(path)
-    if os.path.exists(path):
-        print("Directory %s exists" % path)
-        return True
-    try:
-        os.mkdir(path)
-    except OSError:
-        print("Creation of the directory %s failed" % path)
-        return False
-    else:
-        print("Successfully created the directory %s " % path)
-        return True
-
-def picke_load(pickle_path):
-    if pickle_path.exists():
-        pickle_in = open(str(pickle_path), "rb")
-        return pickle.load(pickle_in)
-    else:
-        return None
-
-def pickle_save(object, pickle_path):
-    pickle_out = open(str(pickle_path), "wb")
-    pickle.dump(object, pickle_out)
-    pickle_out.close()
 
 def extract_data():
     df = pd.read_csv(config.general["dataset_path"])
@@ -62,66 +31,6 @@ def extract_data():
     public_test_data  = (public_test, public_test_labels, public_test_pixels)
     return training_data, private_test_data, public_test_data
 
-def cnn_0(training_data, private_test_data, public_test_data):
-    start = time.time()
-
-
-    cnn = config.cnn_0
-
-    training, training_labels, training_pixels = training_data
-    private_test, private_test_labels, private_test_pixels = private_test_data
-    public_test, public_test_labels, public_test_pixels = public_test_data
-
-    # init cnn
-    model = models.Sequential()
-
-    # convolution
-    model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=(48, 48, 1)))
-    model.add(layers.MaxPooling2D(pool_size=(5, 5), strides=(2, 2)))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-    model.add(layers.AveragePooling2D(pool_size=(3, 3), strides=(2, 2)))
-    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-    model.add(layers.AveragePooling2D(pool_size=(3, 3), strides=(2, 2)))
-
-    model.add(layers.Flatten())
-
-    # add layers
-    model.add(layers.Dense(1024, activation='relu'))
-    model.add(layers.Dropout(0.2))
-    model.add(layers.Dense(1024, activation='relu'))
-    model.add(layers.Dropout(0.2))
-    model.add(layers.Dense(1024, activation='relu'))
-    model.add(layers.Dropout(0.2))
-    model.add(layers.Dense(7, activation='softmax'))
-
-    # launch cnn
-    model.compile(
-        optimizer=cnn["optimizer"],
-        loss=cnn["loss"],
-        metrics=cnn["metrics"]
-    )
-    print(model.summary())
-    hist = model.fit(training_pixels,
-                     training_labels,
-                     batch_size=256,
-                     epochs=cnn["epochs"],
-                     validation_data=(private_test_pixels, private_test_labels)
-                     )
-
-    print("CNN training time: ", str(time.time() - start))
-
-
-    create_dir(config.general["pickle_history_path"])
-    saving_history_path = config.general["pickle_history_path"] / str("history_" + cnn["id"] + ".pickle")
-    history = {
-        "id": cnn["id"],
-        "epochs": cnn["epochs"],
-        "history": hist.history
-    }
-    pickle_save(history, saving_history_path)
-
 
 def main():
     start = time.time()
@@ -131,25 +40,25 @@ def main():
     picle_public_test  = config.general["pickle_data_path"] / "public_test_data.pickle"
 
     # try to load the pickels
-    training_data     = picke_load(pickle_training)
-    private_test_data = picke_load(picle_private_test)
-    public_test_data  = picke_load(picle_public_test)
+    training_data     = jn.picke_load(pickle_training)
+    private_test_data = jn.picke_load(picle_private_test)
+    public_test_data  = jn.picke_load(picle_public_test)
 
     # if there is no pickels extract datasets from csv, transform them and save them in pickels
     if training_data == None or private_test_data == None or public_test_data == None:
 
-        create_dir(config.general["pickle_path"])
-        create_dir(config.general["pickle_data_path"])
+        jn.create_dir(config.general["pickle_path"])
+        jn.create_dir(config.general["pickle_data_path"])
 
         training_data, private_test_data, public_test_data = extract_data()
 
-        pickle_save(training_data, pickle_training)
-        pickle_save(private_test_data, picle_private_test)
-        pickle_save(public_test_data, picle_public_test)
+        jn.pickle_save(training_data, pickle_training)
+        jn.pickle_save(private_test_data, picle_private_test)
+        jn.pickle_save(public_test_data, picle_public_test)
 
     print("Extraction and preprocessing time: ", str(time.time() - start))
 
     # launch a list of cnn
-    cnn_0(training_data, private_test_data, public_test_data)
+    cnn.cnn_0(training_data, private_test_data, public_test_data)
 
 main()

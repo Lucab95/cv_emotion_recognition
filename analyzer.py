@@ -1,19 +1,10 @@
-from pathlib import Path
 from os import listdir
 from os.path import isfile, join
 import re
-from os import path
 import matplotlib.pyplot as plt
-import time
-import pickle
 import config
+import janitor as jn
 
-def picke_load(pickle_path):
-    if pickle_path.exists():
-        pickle_in = open(str(pickle_path), "rb")
-        return pickle.load(pickle_in)
-    else:
-        return None
 
 def cnn_analysis():
     history_path = config.general["pickle_history_path"]
@@ -24,7 +15,7 @@ def cnn_analysis():
         if not correct_regex:
             print(file_name, " not considered")
         else:
-            hist = picke_load(config.general["pickle_history_path"] / file_name)
+            hist = jn.picke_load(config.general["pickle_history_path"] / file_name)
             history_list.append(hist)
 
     for hist in history_list:

@@ -7,12 +7,4 @@ general = {
     "pickle_history_path": Path("../pickels/emotion_recognition/history")
 }
 
-# example
-cnn_0 = {
-    "id": "cnn_0",
-    "epochs": 2,
-    "optimizer": "Adam",
-    "loss": "categorical_crossentropy",
-    "metrics": ["accuracy"]
-}
 
