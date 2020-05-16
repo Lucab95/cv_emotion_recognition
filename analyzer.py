@@ -21,6 +21,9 @@ def cnn_analysis():
     for hist in history_list:
         id = hist["id"]
 
+        print("Test ", id, " accuracy: ", hist["test"][0])
+        print("Test ", id, " loss: ", hist["test"][1])
+
         epochs = range(1, hist["epochs"] + 1)
 
         plt.plot(epochs, hist["history"]["accuracy"], "b", label="Training Success")
