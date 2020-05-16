@@ -62,12 +62,73 @@ def extract_data():
     public_test_data  = (public_test, public_test_labels, public_test_pixels)
     return training_data, private_test_data, public_test_data
 
+def cnn_0(training_data, private_test_data, public_test_data):
+    start = time.time()
+
+
+    cnn = config.cnn_0
+
+    training, training_labels, training_pixels = training_data
+    private_test, private_test_labels, private_test_pixels = private_test_data
+    public_test, public_test_labels, public_test_pixels = public_test_data
+
+    # init cnn
+    model = models.Sequential()
+
+    # convolution
+    model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=(48, 48, 1)))
+    model.add(layers.MaxPooling2D(pool_size=(5, 5), strides=(2, 2)))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=(3, 3), strides=(2, 2)))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.Conv2D(128, (3, 3), activation='relu'))
+    model.add(layers.AveragePooling2D(pool_size=(3, 3), strides=(2, 2)))
+
+    model.add(layers.Flatten())
+
+    # add layers
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(1024, activation='relu'))
+    model.add(layers.Dropout(0.2))
+    model.add(layers.Dense(7, activation='softmax'))
+
+    # launch cnn
+    model.compile(
+        optimizer=cnn["optimizer"],
+        loss=cnn["loss"],
+        metrics=cnn["metrics"]
+    )
+    print(model.summary())
+    hist = model.fit(training_pixels,
+                     training_labels,
+                     batch_size=256,
+                     epochs=cnn["epochs"],
+                     validation_data=(private_test_pixels, private_test_labels)
+                     )
+
+    print("CNN training time: ", str(time.time() - start))
+
+
+    create_dir(config.general["pickle_history_path"])
+    saving_history_path = config.general["pickle_history_path"] / str("history_" + cnn["id"] + ".pickle")
+    history = {
+        "id": cnn["id"],
+        "epochs": cnn["epochs"],
+        "history": hist.history
+    }
+    pickle_save(history, saving_history_path)
+
+
 def main():
     start = time.time()
     # get picke paths
-    pickle_training    = Path(config.general["pickle_data_path"]) / "training_data.pickle"
-    picle_private_test = Path(config.general["pickle_data_path"]) / "private_test_data.pickle"
-    picle_public_test  = Path(config.general["pickle_data_path"]) / "public_test_data.pickle"
+    pickle_training    = config.general["pickle_data_path"] / "training_data.pickle"
+    picle_private_test = config.general["pickle_data_path"] / "private_test_data.pickle"
+    picle_public_test  = config.general["pickle_data_path"] / "public_test_data.pickle"
 
     # try to load the pickels
     training_data     = picke_load(pickle_training)
@@ -86,73 +147,9 @@ def main():
         pickle_save(private_test_data, picle_private_test)
         pickle_save(public_test_data, picle_public_test)
 
-    training, training_labels, training_pixels             = training_data
-    private_test, private_test_labels, private_test_pixels = private_test_data
-    public_test, public_test_labels, public_test_pixels    = public_test_data
-
     print("Extraction and preprocessing time: ", str(time.time() - start))
 
-    for cnn in config.cnn_list:
-        start = time.time()
-        # init cnn
-        model = models.Sequential()
-
-        # convolution
-        model.add(layers.Conv2D(64, (5, 5), activation='relu', input_shape=(48,48,1)))
-        model.add(layers.MaxPooling2D(pool_size=(5,5), strides=(2, 2)))
-        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        model.add(layers.AveragePooling2D(pool_size=(3,3), strides=(2, 2)))
-        model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        model.add(layers.Conv2D(128, (3, 3), activation='relu'))
-        model.add(layers.AveragePooling2D(pool_size=(3,3), strides=(2, 2)))
-
-        model.add(layers.Flatten())
-
-        # add layers
-        model.add(layers.Dense(1024, activation='relu'))
-        model.add(layers.Dropout(0.2))
-        model.add(layers.Dense(1024, activation='relu'))
-        model.add(layers.Dropout(0.2))
-        model.add(layers.Dense(1024, activation='relu'))
-        model.add(layers.Dropout(0.2))
-
-
-        model.add(layers.Dense(7, activation='softmax'))
-
-        # launch cnn
-        model.compile(
-            optimizer = cnn["optimizer"],
-            loss = cnn["loss"],
-            metrics = cnn["metrics"]
-        )
-        print(model.summary())
-        hist = model.fit(training_pixels, training_labels, batch_size = 256, epochs = cnn["epochs"],
-                        validation_data = (private_test_pixels, private_test_labels))
-
-        print("CNN training time: ", str(time.time() - start))
-
-        # get results
-        training_accuracy = hist.history["accuracy"]
-        validation_accuracy = hist.history["val_accuracy"]
-
-        training_loss = hist.history["loss"]
-        validation_loss = hist.history["val_loss"]
-
-        epochs = range(1, cnn["epochs"] + 1)
-
-        plt.plot(epochs, training_accuracy, "b", label = "Training Success")
-        plt.plot(epochs, validation_accuracy, "r", label = "Validation Success")
-        plt.title("Training and Validation results")
-        plt.legend()
-
-        plt.figure()
-
-        plt.plot(epochs, training_loss, "b", label = "Training Loss")
-        plt.plot(epochs, validation_loss, "r", label = "Validation Loss")
-        plt.title("Training and Validation losses")
-        plt.legend()
-
-        plt.show()
+    # launch a list of cnn
+    cnn_0(training_data, private_test_data, public_test_data)
 
 main()
