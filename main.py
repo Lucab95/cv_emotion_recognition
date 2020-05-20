@@ -59,7 +59,7 @@ def main():
     print("Extraction and preprocessing time: ", str(time.time() - start))
 
     # launch a list of cnn
-    #cnn.cnn_0(training_data, private_test_data, public_test_data)
-    cnn.cnn_1(training_data, private_test_data, public_test_data)
+    cnn.cnn_0(training_data, private_test_data, public_test_data)
+    #cnn.cnn_1(training_data, private_test_data, public_test_data)
 
 main()
