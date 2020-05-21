@@ -60,6 +60,14 @@ def main():
 
     # launch a list of cnn
     cnn.cnn_0(training_data, private_test_data, public_test_data)
-    #cnn.cnn_1(training_data, private_test_data, public_test_data)
+    cnn.cnn_1(training_data, private_test_data, public_test_data)
+    cnn.cnn_2(training_data, private_test_data, public_test_data)
+    cnn.cnn_3(training_data, private_test_data, public_test_data)
+    cnn.cnn_4(training_data, private_test_data, public_test_data)
+    cnn.cnn_5(training_data, private_test_data, public_test_data)
+    cnn.cnn_6(training_data, private_test_data, public_test_data)
+    cnn.cnn_7(training_data, private_test_data, public_test_data)
+    cnn.cnn_8(training_data, private_test_data, public_test_data)
+    cnn.cnn_9(training_data, private_test_data, public_test_data)
 
 main()

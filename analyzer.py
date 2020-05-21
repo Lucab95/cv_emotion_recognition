@@ -4,7 +4,9 @@ import re
 import matplotlib.pyplot as plt
 import config
 import janitor as jn
+import numpy as np
 
+SHOW_ALL = False
 
 def cnn_analysis():
     history_path = config.general["pickle_history_path"]
@@ -23,44 +25,65 @@ def cnn_analysis():
         id = hist["id"]
         epochs = range(1, hist["epochs"] + 1)
 
-        plt.plot(epochs, hist["history"]["loss"], "b", label="Training Loss")
-        plt.plot(epochs, hist["history"]["val_loss"], "r", label="Validation Loss")
-        plt.title(str("Training and Validation losses of " + id))
-        plt.legend()
+        if SHOW_ALL:
+            plt.plot(epochs, hist["history"]["loss"], "b", label="Training Loss")
+            plt.plot(epochs, hist["history"]["val_loss"], "r", label="Validation Loss")
+            plt.title(str("Training and Validation losses of " + id))
+            plt.legend()
 
-        plt.figure()
+            plt.figure()
 
-        plt.plot(epochs, hist["history"]["accuracy"], "b", label="Training Success")
-        plt.plot(epochs, hist["history"]["val_accuracy"], "r", label="Validation Success")
-        plt.title(str("Training and Validation results of " + id))
-        plt.legend()
+            plt.plot(epochs, hist["history"]["accuracy"], "b", label="Training Success")
+            plt.plot(epochs, hist["history"]["val_accuracy"], "r", label="Validation Success")
+            plt.title(str("Training and Validation results of " + id))
+            plt.legend()
 
-        plt.show()
+            plt.show()
 
         print("Public Test ", id, " accuracy: ", hist["test"][0])
         print("Public Test ", id, " loss: ", hist["test"][1])
 
         result_list.append([id, hist["history"]["val_accuracy"], hist["history"]["val_loss"]])
 
+    color_list = ["blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna"]
+
     plt.title(str("Accuracy results"))
-    color_list = ["blue", "red", "green", "orange"]
     for i, res in enumerate(result_list):
         id = res[0]
         acc = res[1]
-
         plt.plot(epochs, acc, color_list[i], label=id)
         plt.legend()
 
     plt.show()
 
     plt.title(str("Losses loss"))
-    color_list = ["blue", "red", "green", "orange"]
     for i, res in enumerate(result_list):
         id = res[0]
         los = res[2]
 
         plt.plot(epochs, los, color_list[i], label=id)
         plt.legend()
+
+    plt.show()
+
+    # FINAL PUBLIC TEST CONFRONT
+    objects = [hist["id"] for hist in history_list]
+    accuracy = [hist["test"][0] for hist in history_list]
+    loss = [hist["test"][1] for hist in history_list]
+
+    plt.title("Public test accuracy")
+    y_pos = np.arange(len(objects))
+    plt.bar(y_pos, accuracy, align='center', color=color_list, alpha=0.5)
+    plt.xticks(y_pos, objects)
+    plt.ylabel('Accuracy')
+
+    plt.show()
+
+    plt.title("Public test losses")
+    y_pos = np.arange(len(objects))
+    plt.bar(y_pos, loss, align='center', color=color_list, alpha=0.5)
+    plt.xticks(y_pos, objects)
+    plt.ylabel('Loss')
 
     plt.show()
 
