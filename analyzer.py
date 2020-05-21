@@ -45,7 +45,7 @@ def cnn_analysis():
 
         result_list.append([id, hist["history"]["val_accuracy"], hist["history"]["val_loss"]])
 
-    color_list = ["blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna"]
+    color_list = ["blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna", "blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna"]
 
     plt.title(str("Accuracy results"))
     for i, res in enumerate(result_list):
