@@ -56,6 +56,7 @@ def main():
         jn.pickle_save(private_test_data, picle_private_test)
         jn.pickle_save(public_test_data, picle_public_test)
 
+
     print("Extraction and preprocessing time: ", str(time.time() - start))
 
     # launch a list of cnn
@@ -73,5 +74,7 @@ def main():
     cnn.cnn_L(training_data, private_test_data, public_test_data)
     cnn.cnn_M(training_data, private_test_data, public_test_data)
     cnn.cnn_N(training_data, private_test_data, public_test_data)
+    cnn.cnn_O(training_data, private_test_data, public_test_data)
+    cnn.cnn_P(training_data, private_test_data, public_test_data)
 
 main()

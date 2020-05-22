@@ -45,7 +45,8 @@ def cnn_analysis():
 
         result_list.append([id, hist["history"]["val_accuracy"], hist["history"]["val_loss"]])
 
-    color_list = ["blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna", "blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna"]
+    color_list = ["blue", "black", "red", "green", "pink", "magenta", "cyan", "purple", "yellow", "sienna",
+                  "sandybrown", "olive", "lightslategray", "rosybrown", "dimgray", "lime"]
 
     plt.title(str("Accuracy results"))
     for i, res in enumerate(result_list):
@@ -56,7 +57,7 @@ def cnn_analysis():
 
     plt.show()
 
-    plt.title(str("Losses loss"))
+    plt.title(str("Loss results"))
     for i, res in enumerate(result_list):
         id = res[0]
         los = res[2]
@@ -71,7 +72,7 @@ def cnn_analysis():
     accuracy = [hist["test"][0] for hist in history_list]
     loss = [hist["test"][1] for hist in history_list]
 
-    plt.title("Public test accuracy")
+    plt.title("Confront test accuracy")
     y_pos = np.arange(len(objects))
     plt.bar(y_pos, accuracy, align='center', color=color_list, alpha=0.5)
     plt.xticks(y_pos, objects)
@@ -79,13 +80,12 @@ def cnn_analysis():
 
     plt.show()
 
-    plt.title("Public test losses")
+    plt.title("Confront test losses")
     y_pos = np.arange(len(objects))
     plt.bar(y_pos, loss, align='center', color=color_list, alpha=0.5)
     plt.xticks(y_pos, objects)
     plt.ylabel('Loss')
 
     plt.show()
-
 
 cnn_analysis()
